@@ -5,3 +5,5 @@ owlready2
 requests
 wxPython
 https://github.com/corneliusroemer/pango_aliasor
+# SARSMutOnto
+The output of the SARSMutOnto generator is the file "SARSMutOnto.owl" which contains the SARSMutOnto ontology

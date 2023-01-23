@@ -1,5 +1,5 @@
 # SARSMutOnto Generator
-SARSMutOnto is a Python-based tool specifically designed to generate SARSMutOnto.
+SARSMutOnto is a Python-based tool specifically designed to generate SARSMutOnto ontology.
 # Dependencies of the SARSMutOnto generator
 owlready2
 requests

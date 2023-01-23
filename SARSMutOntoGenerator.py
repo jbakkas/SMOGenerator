@@ -158,7 +158,7 @@ class Ontology:
             self.genes["orf10"]=self.onto.accessory_gene("orf10")
         self.onto.save(format = "rdfxml")
         
-
+who_names={"B.1.1.7":"Alpha", "B.1.351":"Beta", "P.1":"Gamma", "B.1.617.2":"Delta", "B.1.617.1":"Delta", "B.1.617.1":"Delta", "BA.1":"Omicron", "BA.2":"Omicron", "BA.4":"Omicron", "BA.5":"Omicron", "BA.2.12.1":"Omicron", "BA.2.75":"Omicron", "BQ.1":"Omicron", "XBB":"Omicron", "XBB.1.5":"Omicron", "B.1.617.1":"Kappa", "B.1.525":"Eta", "B.1.526":"Iota", "C.37":"Lambda", "B.1.621":"Mu", "B.1.427":"Epsilon" }
 class Generator(threading.Thread):
     def __init__(self, parent,cadre,urlOnto):
         
@@ -266,25 +266,31 @@ class Generator(threading.Thread):
                 indvidual=variantClass(name+"__lineage")
                 indvidual.label=[name]
                 indvidual.has_for_description=[description]
+                if name in who_names:
+                    indvidual.has_for_WHO_name=[who_names[name]]
                 if alias != variant["name"]:
                     indvidual.has_for_alias=[alias]
                 if(name!='A' and name!='B'):
                     self.mutation(name,indvidual,cadre,0)
 #----------------------------------------------------------------------------        
     def mutation(self,name,indvidual,cadre,i):
-        cadre.displayMutation("\t__________"+name+"__________")   
+        cadre.displayMutation("\t__________"+name+"__________")  
+        if name in who_names:
+             cadre.displayMutation("\t WHO name :"+who_names[name])   
         url="https://api.outbreak.info/genomics/lineage-mutations?pangolin_lineage="+name+"&frequency=0.75"
         r=requests.get(url)
         #cadre.displayLine(url)
         try:
             data = r.json()
             if(name not in data["results"]):
-                    if(i<2) : self.mutation(name,indvidual,cadre,i+1)
+                    if(i<1) : self.mutation(name,indvidual,cadre,i+1)
                     return
         except :  # includes simplejson.decoder.JSONDecodeError
             cadre.displayLine('\t Retrieve of '+name+' retry '+str(i+1))
-            if(i<2) : self.mutation(name,indvidual,cadre,i+1)
-            else :  cadre.displayLine('\t Mutations of  '+name+'\t not provided by API')
+            if(i<1) : self.mutation(name,indvidual,cadre,i+1)
+            else :  
+                cadre.displayLine('\t Mutations of  '+name+'\t not provided by API')
+                cadre.displayLine('\t Class of lineage '+name+' created without mutations')
             return
         
         for mut in data["results"][name]:
@@ -296,7 +302,7 @@ class Generator(threading.Thread):
                 my_snp.mutation_name=[aa]
                 my_snp.has_for_gene.append(self.model.genes[g])
                 my_snp.has_for_lineage.append(indvidual)
-                cadre.displayMutation("      "+g+"\t--\t"+aa)                
+                cadre.displayMutation("      "+g+"\t--\t"+aa)     
                     
 class mainApp(wx.App):
     def OnInit(self):
